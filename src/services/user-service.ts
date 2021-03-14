@@ -9,6 +9,12 @@ import type { RoleToUser } from "../entities/role-to-user";
 export default class UserService {
   private users: readonly User[] = [];
 
+  async findUserByEmail(email: string): Promise<User | undefined> {
+    const users = await this.getAllUsers();
+
+    return users.find((u) => u.email === email);
+  }
+
   async getAllUsers(): Promise<readonly User[]> {
     if (this.users.length !== 0) {
       return this.users;
@@ -34,14 +40,36 @@ export default class UserService {
     return this.users;
   }
 
-  getAvailableOperations(user: User, currenUser: User): Operation[] {
-    // Вам нужно поменять логику внутри getAvailableOperations для того, что бы это работало с логином
-    throw new Error("Not Implemented")
-    // if (user instanceof Admin || user instanceof Client) {
-    //   return [Operation.UPDATE_TO_MODERATOR];
-    // }
+  getAvailableOperations<U extends User, CurrentUser extends User>(
+    user: U,
+    currenUser: CurrentUser
+  ): Operation[] {
+    switch (currenUser.role) {
+      case Role.ADMIN:
+        switch (user.role) {
+          case Role.ADMIN:
+            return [Operation.UPDATE_TO_MODERATOR];
+          case Role.MODERATOR:
+            return [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN];
+          case Role.CLIENT:
+            return [Operation.UPDATE_TO_MODERATOR];
+        }
+        break;
 
-    // return [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN];
+      case Role.MODERATOR:
+        switch (user.role) {
+          case Role.ADMIN:
+            return [];
+          case Role.MODERATOR:
+            return [Operation.UPDATE_TO_CLIENT];
+          case Role.CLIENT:
+            return [Operation.UPDATE_TO_MODERATOR];
+        }
+        break;
+
+      case Role.CLIENT:
+        return [];
+    }
   }
 
   getConstructorByRole(role: Role) {
@@ -53,5 +81,17 @@ export default class UserService {
       case Role.MODERATOR:
         return Moderator;
     }
+  }
+
+  isAdmin(user: User): user is Admin {
+    return user instanceof Admin;
+  }
+
+  isClient(user: User): user is Client {
+    return user instanceof Client;
+  }
+
+  isModerator(user: User): user is Moderator {
+    return user instanceof Moderator;
   }
 }
