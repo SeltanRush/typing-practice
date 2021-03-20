@@ -5,9 +5,26 @@ import { Moderator } from "../entities/moderator";
 import { Operation } from "../entities/operation";
 import type { User } from "../entities/user";
 import type { RoleToUser } from "../entities/role-to-user";
-
+import {
+  AvailableAdminOperationsByUserRole,
+  AvailableModeratorOperationsByUserRole,
+  AvailableOperationsByUserRoleFor,
+} from "../entities/available-operations";
+import { UserByRole } from "../entities/user-by-role";
 export default class UserService {
   private users: readonly User[] = [];
+
+  private availableModeratorOperationsByUserRole: AvailableModeratorOperationsByUserRole = {
+    [Role.ADMIN]: [],
+    [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
+    [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT],
+  };
+
+  private availableAdminOperationsByUserRole: AvailableAdminOperationsByUserRole = {
+    [Role.ADMIN]: [Operation.UPDATE_TO_MODERATOR],
+    [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
+    [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN],
+  };
 
   async findUserByEmail(email: string): Promise<User | undefined> {
     const users = await this.getAllUsers();
@@ -40,38 +57,6 @@ export default class UserService {
     return this.users;
   }
 
-  getAvailableOperations<U extends User, CurrentUser extends User>(
-    user: U,
-    currenUser: CurrentUser
-  ): Operation[] {
-    switch (currenUser.role) {
-      case Role.ADMIN:
-        switch (user.role) {
-          case Role.ADMIN:
-            return [Operation.UPDATE_TO_MODERATOR];
-          case Role.MODERATOR:
-            return [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN];
-          case Role.CLIENT:
-            return [Operation.UPDATE_TO_MODERATOR];
-        }
-        break;
-
-      case Role.MODERATOR:
-        switch (user.role) {
-          case Role.ADMIN:
-            return [];
-          case Role.MODERATOR:
-            return [Operation.UPDATE_TO_CLIENT];
-          case Role.CLIENT:
-            return [Operation.UPDATE_TO_MODERATOR];
-        }
-        break;
-
-      case Role.CLIENT:
-        return [];
-    }
-  }
-
   getConstructorByRole(role: Role) {
     switch (role) {
       case Role.ADMIN:
@@ -83,15 +68,36 @@ export default class UserService {
     }
   }
 
-  isAdmin(user: User): user is Admin {
-    return user instanceof Admin;
+  getAvailableOperations<UserRole extends Role, CurrentUserRole extends Role>(
+    user: UserByRole<UserRole>,
+    currenUser: UserByRole<CurrentUserRole>
+  ): AvailableOperationsByUserRoleFor<UserRole>[CurrentUserRole] {
+    return this.getAvailableOperationsByUserRoleFor(currenUser.role, user.role);
   }
 
-  isClient(user: User): user is Client {
-    return user instanceof Client;
+  getAvailableOperationsByUserRoleFor<R extends Role, UserRole extends Role>(
+    role: R,
+    userRole: UserRole
+  ): AvailableOperationsByUserRoleFor<UserRole>[R] {
+    const availableOperationsByUserRoleFor: AvailableOperationsByUserRoleFor<UserRole> = {
+      [Role.ADMIN]: this.getAvailableAdminOperationsByUpdatedUserRole(userRole),
+      [Role.MODERATOR]: this.getAvailableModeratorOperationsByUpdatedUserRole(
+        userRole
+      ),
+      [Role.CLIENT]: [],
+    };
+    return availableOperationsByUserRoleFor[role];
   }
 
-  isModerator(user: User): user is Moderator {
-    return user instanceof Moderator;
+  getAvailableModeratorOperationsByUpdatedUserRole<R extends Role>(
+    userRole: R
+  ): AvailableModeratorOperationsByUserRole[R] {
+    return this.availableModeratorOperationsByUserRole[userRole];
+  }
+
+  getAvailableAdminOperationsByUpdatedUserRole<R extends Role>(
+    userRole: R
+  ): AvailableAdminOperationsByUserRole[R] {
+    return this.availableAdminOperationsByUserRole[userRole];
   }
 }
