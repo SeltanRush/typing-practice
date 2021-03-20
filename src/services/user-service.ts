@@ -11,22 +11,23 @@ import {
   AvailableOperationsByUserRoleFor,
 } from "../entities/available-operations";
 import { UserByRole } from "../entities/user-by-role";
+import { Email } from "../entities/email";
 export default class UserService {
   private users: readonly User[] = [];
 
-  private availableModeratorOperationsByUserRole: AvailableModeratorOperationsByUserRole = {
+  private readonly availableModeratorOperationsByUserRole: AvailableModeratorOperationsByUserRole = {
     [Role.ADMIN]: [],
     [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
     [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT],
   };
 
-  private availableAdminOperationsByUserRole: AvailableAdminOperationsByUserRole = {
+  private readonly availableAdminOperationsByUserRole: AvailableAdminOperationsByUserRole = {
     [Role.ADMIN]: [Operation.UPDATE_TO_MODERATOR],
     [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
     [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN],
   };
 
-  async findUserByEmail(email: string): Promise<User | undefined> {
+  async findUserByEmail(email: Email): Promise<User | undefined> {
     const users = await this.getAllUsers();
 
     return users.find((u) => u.email === email);

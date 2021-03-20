@@ -17,10 +17,14 @@ export default function useLogin(credentials: Credentials | null): User | null {
     if (!credentials || !dispatch) {
       return;
     }
-    loginService.login(credentials.email, credentials.password)
-      .then((user: User) => dispatch!({ type: LogedInActionType.LOG_IN, payload: user }))
+    loginService
+      .login(credentials.email, credentials.password)
+      .then((user: User) =>
+        dispatch!({ type: LogedInActionType.LOG_IN, payload: user })
+      )
       .then(() => navigate("/"))
-      .catch(e => alert(e.message));
+      .catch((e) => alert(e.message));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [credentials, dispatch]);
 
   return state.user;

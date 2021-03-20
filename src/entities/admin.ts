@@ -1,6 +1,8 @@
 import { Role } from "./role";
 import { AccountInfo } from "./account-info";
 import type { User } from "./user";
+import { Email } from "./email";
+import { Password } from "./password";
 
 export class Admin extends AccountInfo {
   static of(user: User): Admin {
@@ -12,12 +14,7 @@ export class Admin extends AccountInfo {
 
   static from(obj: object): Admin {
     if (AccountInfo.is(obj)) {
-      return new Admin(
-        obj.id,
-        obj.name,
-        obj.email,
-        obj.password,
-      );
+      return new Admin(obj.id, obj.name, obj.email, obj.password);
     }
     throw new TypeError("Object is not Admin");
   }
@@ -28,8 +25,8 @@ export class Admin extends AccountInfo {
   protected constructor(
     id: string,
     name: string,
-    email: string,
-    password: string
+    email: Email,
+    password: Password
   ) {
     super(id, name, email, password);
   }

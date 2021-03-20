@@ -1,7 +1,8 @@
 import { Role } from "./role";
-import { Operation } from "../entities/operation";
 import { AccountInfo } from "./account-info";
 import type { User } from "./user";
+import { Email } from "./email";
+import { Password } from "./password";
 
 export class Client extends AccountInfo {
   static of(user: User): Client {
@@ -13,12 +14,7 @@ export class Client extends AccountInfo {
 
   static from(obj: object): Client {
     if (AccountInfo.is(obj)) {
-      return new Client(
-        obj.id,
-        obj.name,
-        obj.email,
-        obj.password,
-      );
+      return new Client(obj.id, obj.name, obj.email, obj.password);
     }
     throw new TypeError("Object is not Admin");
   }
@@ -29,8 +25,8 @@ export class Client extends AccountInfo {
   protected constructor(
     id: string,
     name: string,
-    email: string,
-    password: string
+    email: Email,
+    password: Password
   ) {
     super(id, name, email, password);
   }

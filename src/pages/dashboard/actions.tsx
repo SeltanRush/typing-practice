@@ -3,6 +3,7 @@ import { Operation } from "../../entities/operation";
 import { Dropdown, Menu } from "antd";
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
 import type { User } from "../../entities/user";
+import { convertArrayUnionToArrayOfUnions } from "../../utils/convert-array-union-to-array-of-unions";
 
 type ActionsProps = {
   user: User;
@@ -14,7 +15,7 @@ export default function Actions({ user, currentUser, onAction }: ActionsProps) {
   const operations = useOperations(user, currentUser);
   const menu = (
     <Menu>
-      {operations.map((operation, key) => (
+      {convertArrayUnionToArrayOfUnions(operations).map((operation, key) => (
         <Menu.Item
           key={key}
           icon={<UserOutlined />}

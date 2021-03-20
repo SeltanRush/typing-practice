@@ -1,6 +1,8 @@
 import { Role } from "./role";
 import { AccountInfo } from "./account-info";
 import type { User } from "./user";
+import { Email } from "./email";
+import { Password } from "./password";
 
 export class Moderator extends AccountInfo {
   static of(user: User): Moderator {
@@ -23,8 +25,8 @@ export class Moderator extends AccountInfo {
   protected constructor(
     id: string,
     name: string,
-    email: string,
-    password: string
+    email: Email,
+    password: Password
   ) {
     super(id, name, email, password);
   }

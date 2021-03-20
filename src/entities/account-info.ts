@@ -1,17 +1,22 @@
+import { Email } from "./email";
+import { Password } from "./password";
+
 export class AccountInfo {
   static is(obj: any): obj is AccountInfo {
-    return typeof obj === "object" &&
-           obj !== null &&
-           typeof obj.id === "string" &&
-           typeof obj.name === "string" &&
-           typeof obj.email === "string" &&
-           typeof obj.password === "string";
+    return (
+      typeof obj === "object" &&
+      obj !== null &&
+      typeof obj.id === "string" &&
+      typeof obj.name === "string" &&
+      Email.is(obj.email) &&
+      Password.is(obj.password)
+    );
   }
 
   protected constructor(
     public readonly id: string,
     public readonly name: string,
-    public readonly email: string,
-    public readonly password: string
+    public readonly email: Email,
+    public readonly password: Password
   ) {}
 }
