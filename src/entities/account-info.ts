@@ -2,7 +2,7 @@ import { Email } from "./email";
 import { Password } from "./password";
 
 export class AccountInfo {
-  static is(obj: any): obj is AccountInfo {
+  protected static is(obj: any): obj is AccountInfo {
     return (
       typeof obj === "object" &&
       obj !== null &&

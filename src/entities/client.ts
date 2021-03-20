@@ -5,8 +5,12 @@ import { Email } from "./email";
 import { Password } from "./password";
 
 export class Client extends AccountInfo {
+  static is(user: User): user is Client {
+    return user instanceof Client;
+  }
+
   static of(user: User): Client {
-    if (user instanceof Client) {
+    if (this.is(user)) {
       return user;
     }
     throw new TypeError("User is not client!");

@@ -7,7 +7,22 @@ import useUsers from "../../hooks/use-users";
 import useCurrentUser from "../../hooks/use-current-user";
 import { Table, Breadcrumb } from "antd";
 import type { User } from "../../entities/user";
-import type { RouteComponentProps } from "@reach/router";
+import { navigate, RouteComponentProps } from "@reach/router";
+import { Moderator } from "../../entities/moderator";
+import { Admin } from "../../entities/admin";
+import { useEffect, useLayoutEffect } from "react";
+import NotFound from "../not-found";
+
+type DashboardAllowedUser = Admin | Moderator;
+
+const isAllowedUser = (user: User): user is DashboardAllowedUser => {
+  console.log(user, "user");
+  console.log(
+    Admin.is(user) || Moderator.is(user),
+    "Admin.is(user) || Moderator.is(user)"
+  );
+  return Admin.is(user) || Moderator.is(user);
+};
 
 export default function Dashboard(_: RouteComponentProps) {
   const currentUser = useCurrentUser();
@@ -39,7 +54,7 @@ export default function Dashboard(_: RouteComponentProps) {
     },
   ];
 
-  return (
+  return isAllowedUser(currentUser) ? (
     <Page>
       <Breadcrumb style={{ margin: "16px 0" }}>
         <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
@@ -48,5 +63,7 @@ export default function Dashboard(_: RouteComponentProps) {
         <Table rowKey="id" columns={columns} dataSource={users} />
       </div>
     </Page>
+  ) : (
+    <NotFound />
   );
 }

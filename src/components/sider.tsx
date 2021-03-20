@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Layout, Menu } from "antd";
-import {
-  FileOutlined,
-  UserOutlined,
-  PieChartOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, PieChartOutlined } from "@ant-design/icons";
+import { Link } from "@reach/router";
 
 export default function Sider() {
   const [collapsed, onCollapse] = useState(false);
@@ -12,15 +9,12 @@ export default function Sider() {
   return (
     <Layout.Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
       <div className="logo" />
-      <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
-        <Menu.Item key="1" icon={<PieChartOutlined />}>
-          Dashboard
+      <Menu theme="dark" mode="inline">
+        <Menu.Item key="1" icon={<UserOutlined />}>
+          <Link to="/">Home</Link>
         </Menu.Item>
-        <Menu.Item key="2" icon={<UserOutlined />}>
-          User
-        </Menu.Item>
-        <Menu.Item key="3" icon={<FileOutlined />}>
-          Files
+        <Menu.Item key="2" icon={<PieChartOutlined />}>
+          <Link to="/dashboard">Dashboard</Link>
         </Menu.Item>
       </Menu>
     </Layout.Sider>

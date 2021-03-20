@@ -22,7 +22,7 @@ export default function useLogin(credentials: Credentials | null): User | null {
       .then((user: User) =>
         dispatch!({ type: LogedInActionType.LOG_IN, payload: user })
       )
-      .then(() => navigate("/"))
+      .then(() => navigate("/dashboard"))
       .catch((e) => alert(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [credentials, dispatch]);

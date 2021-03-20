@@ -5,8 +5,12 @@ import { Email } from "./email";
 import { Password } from "./password";
 
 export class Admin extends AccountInfo {
+  static is(user: User): user is Admin {
+    return user instanceof Admin;
+  }
+
   static of(user: User): Admin {
-    if (user instanceof Admin) {
+    if (this.is(user)) {
       return user;
     }
     throw new TypeError("User is not admin!");
