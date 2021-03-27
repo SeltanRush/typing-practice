@@ -1,20 +1,22 @@
 import { Operation } from "./operation";
 import { Role } from "./role";
 
-export type AvailableOperationsByUserRoleFor<UserRole extends Role> = {
-  [Role.ADMIN]: AvailableAdminOperationsByUserRole[UserRole];
-  [Role.MODERATOR]: AvailableModeratorOperationsByUserRole[UserRole];
-  [Role.CLIENT]: [];
-};
+export const AVAILABLE_OPERATIONS = {
+  [Role.CLIENT]: {
+    [Role.ADMIN]: [],
+    [Role.MODERATOR]: [],
+    [Role.CLIENT]: [],
+  },
+  [Role.MODERATOR]: {
+    [Role.ADMIN]: [],
+    [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT],
+    [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
+  },
+  [Role.ADMIN]: {
+    [Role.ADMIN]: [Operation.UPDATE_TO_MODERATOR],
+    [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN],
+    [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
+  },
+} as const;
 
-export type AvailableModeratorOperationsByUserRole = {
-  [Role.ADMIN]: [];
-  [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR];
-  [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT];
-};
-
-export type AvailableAdminOperationsByUserRole = {
-  [Role.ADMIN]: [Operation.UPDATE_TO_MODERATOR];
-  [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN];
-  [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR];
-};
+export type AvailableOperations = typeof AVAILABLE_OPERATIONS;

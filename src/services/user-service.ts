@@ -2,30 +2,17 @@ import { Role } from "../entities/role";
 import { Admin } from "../entities/admin";
 import { Client } from "../entities/client";
 import { Moderator } from "../entities/moderator";
-import { Operation } from "../entities/operation";
 import type { User } from "../entities/user";
 import type { RoleToUser } from "../entities/role-to-user";
-import {
-  AvailableAdminOperationsByUserRole,
-  AvailableModeratorOperationsByUserRole,
-  AvailableOperationsByUserRoleFor,
-} from "../entities/available-operations";
 import { UserByRole } from "../entities/user-by-role";
 import { Email } from "../entities/email";
+import {
+  AvailableOperations,
+  AVAILABLE_OPERATIONS,
+} from "../entities/available-operations";
+
 export default class UserService {
   private users: readonly User[] = [];
-
-  private readonly availableModeratorOperationsByUserRole: AvailableModeratorOperationsByUserRole = {
-    [Role.ADMIN]: [],
-    [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
-    [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT],
-  };
-
-  private readonly availableAdminOperationsByUserRole: AvailableAdminOperationsByUserRole = {
-    [Role.ADMIN]: [Operation.UPDATE_TO_MODERATOR],
-    [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
-    [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN],
-  };
 
   async findUserByEmail(email: Email): Promise<User | undefined> {
     const users = await this.getAllUsers();
@@ -71,34 +58,8 @@ export default class UserService {
 
   getAvailableOperations<UserRole extends Role, CurrentUserRole extends Role>(
     user: UserByRole<UserRole>,
-    currenUser: UserByRole<CurrentUserRole>
-  ): AvailableOperationsByUserRoleFor<UserRole>[CurrentUserRole] {
-    return this.getAvailableOperationsByUserRoleFor(currenUser.role, user.role);
-  }
-
-  getAvailableOperationsByUserRoleFor<R extends Role, UserRole extends Role>(
-    role: R,
-    userRole: UserRole
-  ): AvailableOperationsByUserRoleFor<UserRole>[R] {
-    const availableOperationsByUserRoleFor: AvailableOperationsByUserRoleFor<UserRole> = {
-      [Role.ADMIN]: this.getAvailableAdminOperationsByUpdatedUserRole(userRole),
-      [Role.MODERATOR]: this.getAvailableModeratorOperationsByUpdatedUserRole(
-        userRole
-      ),
-      [Role.CLIENT]: [],
-    };
-    return availableOperationsByUserRoleFor[role];
-  }
-
-  getAvailableModeratorOperationsByUpdatedUserRole<R extends Role>(
-    userRole: R
-  ): AvailableModeratorOperationsByUserRole[R] {
-    return this.availableModeratorOperationsByUserRole[userRole];
-  }
-
-  getAvailableAdminOperationsByUpdatedUserRole<R extends Role>(
-    userRole: R
-  ): AvailableAdminOperationsByUserRole[R] {
-    return this.availableAdminOperationsByUserRole[userRole];
+    currentUser: UserByRole<CurrentUserRole>
+  ): AvailableOperations[CurrentUserRole][UserRole] {
+    return AVAILABLE_OPERATIONS[currentUser.role][user.role];
   }
 }

@@ -1,8 +1,13 @@
-import Services from "../services";
 import { useContext } from "react";
-import type { User } from "../entities/user";
 
-export default function useOperations(user: User, currentUser: User) {
+import Services from "../services";
+import { UserByRole } from "../entities/user-by-role";
+import { Role } from "../entities/role";
+
+export default function useOperations<
+  UserRole extends Role,
+  CurrentUserRole extends Role
+>(user: UserByRole<UserRole>, currentUser: UserByRole<CurrentUserRole>) {
   const { userService } = useContext(Services);
   return userService.getAvailableOperations(user, currentUser);
 }
