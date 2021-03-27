@@ -7,20 +7,14 @@ import useUsers from "../../hooks/use-users";
 import useCurrentUser from "../../hooks/use-current-user";
 import { Table, Breadcrumb } from "antd";
 import type { User } from "../../entities/user";
-import { navigate, RouteComponentProps } from "@reach/router";
+import { RouteComponentProps } from "@reach/router";
 import { Moderator } from "../../entities/moderator";
 import { Admin } from "../../entities/admin";
-import { useEffect, useLayoutEffect } from "react";
 import NotFound from "../not-found";
 
 type DashboardAllowedUser = Admin | Moderator;
 
 const isAllowedUser = (user: User): user is DashboardAllowedUser => {
-  console.log(user, "user");
-  console.log(
-    Admin.is(user) || Moderator.is(user),
-    "Admin.is(user) || Moderator.is(user)"
-  );
   return Admin.is(user) || Moderator.is(user);
 };
 
