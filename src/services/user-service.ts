@@ -10,6 +10,7 @@ import {
   AvailableOperations,
   AVAILABLE_OPERATIONS,
 } from "../entities/available-operations";
+import { Password } from "../entities/password";
 
 export default class UserService {
   private users: readonly User[] = [];
@@ -17,7 +18,7 @@ export default class UserService {
   async findUserByEmail(email: Email): Promise<User | undefined> {
     const users = await this.getAllUsers();
 
-    return users.find((u) => u.email === email);
+    return users.find((u) => Email.equals(email, u.email));
   }
 
   async getAllUsers(): Promise<readonly User[]> {
@@ -27,7 +28,11 @@ export default class UserService {
     const response = await this.fetch();
     this.users = response.default.map((u: any) => {
       const User = this.getConstructorByRole(u.role);
-      return User.from(u);
+      return User.from({
+        ...u,
+        email: Email.from(u.email),
+        password: Password.from(u.password),
+      });
     });
     return this.users;
   }

@@ -17,7 +17,11 @@ export class Password extends String {
     throw new Error("X isn't password");
   }
 
+  static equals(a: Password, b: Password) {
+    return a.toString() === b.toString();
+  }
+
   protected static isValid(x: string) {
-    return x.length > 0;
+    return x.length > 1;
   }
 }

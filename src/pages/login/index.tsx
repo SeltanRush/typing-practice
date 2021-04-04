@@ -3,13 +3,34 @@ import useLogin from "../../hooks/use-login";
 import { useState } from "react";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Card, Form, Input, Button, Layout, Typography } from "antd";
-import type { Credentials } from "../../hooks/use-login";
 import type { RouteComponentProps } from "@reach/router";
+import { Email } from "../../entities/email";
+import { Password } from "../../entities/password";
+
+type CredentialsFrom = {
+  email: string;
+  password: string;
+};
 
 export default function Login(_: RouteComponentProps) {
-  const [credentials, setCredentials] = useState<Credentials | null>(null);
+  const [error, changeError] = useState(null);
 
-  useLogin(credentials);
+  const { login } = useLogin();
+
+  const onSubmit = (form: CredentialsFrom | null) => {
+    if (form) {
+      try {
+        const email = Email.from(form.email);
+        const password = Password.from(form.password);
+        login({
+          email,
+          password,
+        });
+      } catch (e) {
+        changeError(e.toString());
+      }
+    }
+  };
 
   return (
     <Layout className="full-page login">
@@ -19,7 +40,7 @@ export default function Login(_: RouteComponentProps) {
           name="normal_login"
           className="login-form"
           initialValues={{ remember: true }}
-          onFinish={setCredentials}
+          onFinish={onSubmit}
         >
           <Form.Item
             name="email"
@@ -58,6 +79,7 @@ export default function Login(_: RouteComponentProps) {
             >
               Log in
             </Button>
+            {error ? <div className="error">{error}</div> : null}
           </Form.Item>
         </Form>
       </Card>
