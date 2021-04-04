@@ -1,15 +1,23 @@
 export class Password extends String {
   private readonly _type = Symbol("password");
 
-  static is(x: unknown): x is Password {
-    return typeof x === "string" && x.length > 0;
+  private constructor(value: string) {
+    super(value);
+  }
+
+  static is(x: unknown) {
+    return x instanceof Password;
   }
 
   static from(x: unknown) {
-    if (this.is(x)) {
-      return x;
+    if (typeof x === "string" && this.isValid(x)) {
+      return new Password(x);
     }
 
     throw new Error("X isn't password");
+  }
+
+  protected static isValid(x: string) {
+    return x.length > 0;
   }
 }

@@ -3,20 +3,19 @@ import { navigate } from "@reach/router";
 import { useContext, useEffect } from "react";
 import { LogedInActionType, LogedInUser } from "../providers/loged-in-user";
 import type { User } from "../entities/user";
+import { Email } from "../entities/email";
+import { Password } from "../entities/password";
 
-export type Credentials = {
-  email: string;
-  password: string;
+type Credentials = {
+  email: Email;
+  password: Password;
 };
 
-export default function useLogin(credentials: Credentials | null): User | null {
+export default function useLogin() {
   const { loginService } = useContext(Services);
   const { dispatch, state = { user: null } } = useContext(LogedInUser);
 
-  useEffect(() => {
-    if (!credentials || !dispatch) {
-      return;
-    }
+  const login = (credentials: Credentials) => {
     loginService
       .login(credentials.email, credentials.password)
       .then((user: User) =>
@@ -24,8 +23,7 @@ export default function useLogin(credentials: Credentials | null): User | null {
       )
       .then(() => navigate("/dashboard"))
       .catch((e) => alert(e.message));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [credentials, dispatch]);
+  };
 
-  return state.user;
+  return { user: state.user, login };
 }

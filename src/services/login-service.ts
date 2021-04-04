@@ -6,13 +6,7 @@ import UserService from "./user-service";
 export default class LoginService {
   constructor(private userService: UserService) {}
 
-  public async login(
-    maybeEmail: unknown,
-    maybePassword: unknown
-  ): Promise<User> {
-    const email = Email.from(maybeEmail);
-    const password = Password.from(maybePassword);
-
+  public async login(email: Email, password: Password): Promise<User> {
     const user = await this.userService.findUserByEmail(email);
 
     if (user && user.password === password) {

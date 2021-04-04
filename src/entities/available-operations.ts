@@ -17,6 +17,6 @@ export const AVAILABLE_OPERATIONS = {
     [Role.MODERATOR]: [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN],
     [Role.CLIENT]: [Operation.UPDATE_TO_MODERATOR],
   },
-} as const;
+};
 
 export type AvailableOperations = typeof AVAILABLE_OPERATIONS;
