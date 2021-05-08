@@ -1,22 +1,8 @@
-import { Email } from "./email";
-import { Password } from "./password";
+import * as t from "runtypes";
 
-export class AccountInfo {
-  protected static is(obj: any): obj is AccountInfo {
-    return (
-      typeof obj === "object" &&
-      obj !== null &&
-      typeof obj.id === "string" &&
-      typeof obj.name === "string" &&
-      Email.is(obj.email) &&
-      Password.is(obj.password)
-    );
-  }
-
-  protected constructor(
-    public readonly id: string,
-    public readonly name: string,
-    public readonly email: Email,
-    public readonly password: Password
-  ) {}
-}
+export const AccountInfo = t.Record({
+  id: t.String,
+  name: t.String,
+  email: t.String,
+  password: t.String,
+});

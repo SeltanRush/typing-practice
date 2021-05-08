@@ -1,8 +1,9 @@
 import { Role } from "../entities/role";
+import { User } from "../entities/user";
 import { Admin } from "../entities/admin";
+import { castTo } from "../entities/role-to-user";
 import { Client } from "../entities/client";
-import { Moderator } from "../entities/moderator";
-import type { User } from "../entities/user";
+import { Operation } from "../entities/operation";
 import type { RoleToUser } from "../entities/role-to-user";
 import { UserByRole } from "../entities/user-by-role";
 import { Email } from "../entities/email";
@@ -26,14 +27,7 @@ export default class UserService {
       return this.users;
     }
     const response = await this.fetch();
-    this.users = response.default.map((u: any) => {
-      const User = this.getConstructorByRole(u.role);
-      return User.from({
-        ...u,
-        email: Email.from(u.email),
-        password: Password.from(u.password),
-      });
-    });
+    this.users = response.default.map((u: any) => User.check(u));
     return this.users;
   }
 
@@ -41,30 +35,17 @@ export default class UserService {
     return import("../mocks/users.json");
   }
 
-  async updateUserRole<R extends Role>(
-    user: Readonly<RoleToUser[R]>,
-    newRole: R
-  ) {
-    const User = this.getConstructorByRole(newRole);
-    this.users = this.users.map((u) => (u.id === user.id ? User.from(u) : u));
+  async updateUserRole<R extends Role>(user: RoleToUser[R], newRole: R) {
+    const newUser = castTo(newRole, user);
+    this.users = this.users.map((u) => (u.id === user.id ? newUser : u));
     return this.users;
   }
 
-  getConstructorByRole(role: Role) {
-    switch (role) {
-      case Role.ADMIN:
-        return Admin;
-      case Role.CLIENT:
-        return Client;
-      case Role.MODERATOR:
-        return Moderator;
+  getAvailableOperations(user: User) {
+    if (Admin.guard(user) || Client.guard(user)) {
+      return [Operation.UPDATE_TO_MODERATOR];
     }
-  }
 
-  getAvailableOperations<UserRole extends Role, CurrentUserRole extends Role>(
-    user: UserByRole<UserRole>,
-    currentUser: UserByRole<CurrentUserRole>
-  ): AvailableOperations[CurrentUserRole][UserRole] {
-    return AVAILABLE_OPERATIONS[currentUser.role][user.role];
+    return [Operation.UPDATE_TO_CLIENT, Operation.UPDATE_TO_ADMIN];
   }
 }
