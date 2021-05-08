@@ -20,8 +20,8 @@ export default function Login(_: RouteComponentProps) {
   const onSubmit = (form: CredentialsFrom | null) => {
     if (form) {
       try {
-        const email = Email.from(form.email);
-        const password = Password.from(form.password);
+        const email = Email.check(form.email);
+        const password = Password.check(form.password);
         login({
           email,
           password,

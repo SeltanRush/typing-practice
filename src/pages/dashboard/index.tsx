@@ -15,7 +15,7 @@ import NotFound from "../not-found";
 type DashboardAllowedUser = Admin | Moderator;
 
 const isAllowedUser = (user: User): user is DashboardAllowedUser => {
-  return Admin.is(user) || Moderator.is(user);
+  return Admin.guard(user) || Moderator.guard(user);
 };
 
 export default function Dashboard(_: RouteComponentProps) {

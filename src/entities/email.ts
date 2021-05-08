@@ -1,30 +1,7 @@
-export class Email extends String {
-  private readonly _type = Symbol("email");
+import * as t from "runtypes";
 
-  private value: string;
+export const Email = t.String.withBrand("Email").withConstraint((maybeEmail) =>
+  maybeEmail.includes("@")
+);
 
-  private constructor(value: string) {
-    super(value);
-    this.value = value;
-  }
-
-  static is(x: unknown) {
-    return x instanceof Email;
-  }
-
-  static from(x: unknown) {
-    if (typeof x === "string" && this.isValid(x)) {
-      return new Email(x);
-    }
-
-    throw new Error("X isn't email");
-  }
-
-  static equals(a: Email, b: Email) {
-    return a.toString() === b.toString();
-  }
-
-  protected static isValid(x: string) {
-    return x.includes("@");
-  }
-}
+export type Email = t.Static<typeof Email>;

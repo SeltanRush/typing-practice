@@ -9,7 +9,7 @@ export default class LoginService {
   public async login(email: Email, password: Password): Promise<User> {
     const user = await this.userService.findUserByEmail(email);
 
-    if (user && Password.equals(user.password, password)) {
+    if (user && user.password === password) {
       return user;
     }
 
